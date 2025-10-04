@@ -1,18 +1,18 @@
--- 伊尔德Hub UI（保留原尺寸外观+新增最小化功能）
+local UIS = game:GetService("UserInputService")
 local VenusUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/Stefanuk12/Venyx-UI-Library/main/source.lua"))()
 
-local Window = VenusUI.new("伊尔德Hub", 5013109572)
+local Window = VenusUI.new("伊尔德 DANGER", 5013109572)
 local isMinimized = false
 local RestoreButton
 
--- 1. 主窗口容器（保留原配置：700x500+深色+初始位置）
+-- 主窗口容器
 Window.Container.Size = UDim2.new(0, 700, 0, 500)
 Window.Container.BackgroundColor3 = Color3.new(0.08, 0.08, 0.08)
 Window.Container.BackgroundTransparency = 0.1
 Window.Container.Position = UDim2.new(0.1, 0, 0.1, 0)
 Window.Container.ZIndex = 100
 
--- 2. 主标题栏（保留原配置：35px高+深色背景）
+-- 主标题栏
 local TitleBar = Instance.new("Frame")
 TitleBar.Name = "TitleBar"
 TitleBar.Size = UDim2.new(1, 0, 0, 35)
@@ -21,10 +21,10 @@ TitleBar.BackgroundColor3 = Color3.new(0.05, 0.05, 0.05)
 TitleBar.ZIndex = 101
 TitleBar.Parent = Window.Container
 
--- 标题文本（保留原配置）
+-- 标题文本
 local TitleText = Instance.new("TextLabel")
 TitleText.Name = "TitleText"
-TitleText.Text = "伊尔德Hub（标题栏可拖拽）"
+TitleText.Text = "伊尔德 DANGER（标题栏可拖拽）"
 TitleText.Size = UDim2.new(1, -100, 1, 0)
 TitleText.Position = UDim2.new(0, 10, 0, 0)
 TitleText.BackgroundTransparency = 1
@@ -33,7 +33,7 @@ TitleText.TextScaled = true
 TitleText.ZIndex = 102
 TitleText.Parent = TitleBar
 
--- 3. 最小化按钮（新增，保留原风格）
+-- 最小化按钮（减号样式）
 local MinimizeButton = Instance.new("TextButton")
 MinimizeButton.Name = "MinimizeButton"
 MinimizeButton.Text = "—"
@@ -49,14 +49,14 @@ MinimizeButton.Parent = TitleBar
 MinimizeButton.MouseButton1Click:Connect(function()
     if not isMinimized then
         Window.Container.Visible = false
-        -- 创建恢复按钮（保留原风格：60x40+左上角）
+        -- 创建恢复按钮（样式与图片一致）
         RestoreButton = Instance.new("TextButton")
         RestoreButton.Name = "RestoreButton"
-        RestoreButton.Text = "显示"
-        RestoreButton.Size = UDim2.new(0, 60, 0, 40)
-        RestoreButton.Position = UDim2.new(0, 10, 0, 10)
-        RestoreButton.BackgroundColor3 = Color3.new(0.05, 0.05, 0.05)
-        RestoreButton.TextColor3 = Color3.new(1, 1, 1)
+        RestoreButton.Text = "伊尔德 DANGER"
+        RestoreButton.Size = UDim2.new(0, 200, 0, 50) -- 调整尺寸匹配风格
+        RestoreButton.Position = UDim2.new(0, 10, 1, -60) -- 左下角位置
+        RestoreButton.BackgroundColor3 = Color3.new(0, 0, 0) -- 黑色背景
+        RestoreButton.TextColor3 = Color3.new(1, 1, 1) -- 白色文字
         RestoreButton.TextScaled = true
         RestoreButton.ZIndex = 99999
         RestoreButton.Parent = game.Players.LocalPlayer.PlayerGui
@@ -72,7 +72,7 @@ MinimizeButton.MouseButton1Click:Connect(function()
     end
 end)
 
--- 4. 关闭按钮（保留原配置）
+-- 关闭按钮
 local CloseButton = Instance.new("TextButton")
 CloseButton.Name = "CloseButton"
 CloseButton.Text = "✕"
@@ -89,7 +89,7 @@ CloseButton.MouseButton1Click:Connect(function()
     Window.Container:Destroy()
 end)
 
--- 5. 全局拖拽逻辑（保留原配置）
+-- 全局拖拽逻辑
 local dragState = {
     isDragging = false,
     offset = Vector2.new(0, 0),
@@ -123,4 +123,4 @@ game:GetService("RunService").RenderStepped:Connect(function()
     dragState.target.Position = UDim2.new(0, newX, 0, newY)
 end)
 
-print("✅ 伊尔德Hub UI（保留原尺寸外观+最小化功能）加载成功")
+print("✅ 伊尔德 DANGER UI（含风格化恢复按钮）加载成功")
