@@ -1,26 +1,21 @@
--- 伊尔德 DANGER UI 完整脚本（支持拖拽+最小化）
 local UIS = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
 local VenusUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/Stefanuk12/Venyx-UI-Library/main/source.lua"))()
 
--- 1. 初始化窗口核心配置
 local Window = VenusUI.new("伊尔德 DANGER", 5013109572)
 local isMinimized = false
 local RestoreButton
-local dragInfo = {
-    isDragging = false,
-    startPos = Vector2.new(0, 0),
-    offset = Vector2.new(0, 0)
-}
+local isDragging = false
+local dragOffset = Vector2.new(0, 0)
 
--- 2. 主窗口容器（基础样式+黑色边框）
+-- 主窗口容器
 Window.Container.Size = UDim2.new(0, 700, 0, 500)
 Window.Container.BackgroundColor3 = Color3.new(0.08, 0.08, 0.08)
 Window.Container.BackgroundTransparency = 0.1
 Window.Container.Position = UDim2.new(0.1, 0, 0.1, 0)
 Window.Container.ZIndex = 100
 
--- 窗口边框（强化警示风格）
+-- 窗口边框
 local Border = Instance.new("Frame")
 Border.Name = "WindowBorder"
 Border.Size = UDim2.new(1, 4, 1, 4)
@@ -29,13 +24,13 @@ Border.BackgroundColor3 = Color3.new(0, 0, 0)
 Border.ZIndex = 99
 Border.Parent = Window.Container
 
--- 3. 可拖拽标题栏（核心交互区域）
+-- 可拖拽标题栏（ZIndex 提升确保点击优先级）
 local TitleBar = Instance.new("Frame")
 TitleBar.Name = "TitleBar"
 TitleBar.Size = UDim2.new(1, 0, 0, 35)
 TitleBar.Position = UDim2.new(0, 0, 0, 0)
 TitleBar.BackgroundColor3 = Color3.new(0.05, 0.05, 0.05)
-TitleBar.ZIndex = 101
+TitleBar.ZIndex = 1000  -- 提升层级，确保点击事件优先
 TitleBar.Parent = Window.Container
 
 -- 标题文本
@@ -47,10 +42,9 @@ TitleText.Position = UDim2.new(0, 10, 0, 0)
 TitleText.BackgroundTransparency = 1
 TitleText.TextColor3 = Color3.new(1, 1, 1)
 TitleText.TextScaled = true
-TitleText.ZIndex = 102
+TitleText.ZIndex = 1001
 TitleText.Parent = TitleBar
 
--- 4. 功能按钮（最小化+关闭）
 -- 最小化按钮
 local MinBtn = Instance.new("TextButton")
 MinBtn.Name = "MinimizeButton"
@@ -60,7 +54,7 @@ MinBtn.Position = UDim2.new(1, -75, 0, 2.5)
 MinBtn.BackgroundColor3 = Color3.new(0.15, 0.15, 0.15)
 MinBtn.TextColor3 = Color3.new(1, 1, 1)
 MinBtn.TextScaled = true
-MinBtn.ZIndex = 103
+MinBtn.ZIndex = 1002
 MinBtn.Parent = TitleBar
 
 -- 关闭按钮
@@ -72,46 +66,43 @@ CloseBtn.Position = UDim2.new(1, -35, 0, 2.5)
 CloseBtn.BackgroundColor3 = Color3.new(0.2, 0, 0)
 CloseBtn.TextColor3 = Color3.new(1, 1, 1)
 CloseBtn.TextScaled = true
-CloseBtn.ZIndex = 103
+CloseBtn.ZIndex = 1003
 CloseBtn.Parent = TitleBar
 
--- 5. 拖拽逻辑（修复潜在失效问题）
+-- 拖拽逻辑（兼容鼠标和触摸事件）
 TitleBar.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 and not isMinimized then
-        dragInfo.isDragging = true
-        dragInfo.startPos = UIS:GetMouseLocation()
-        local absPos = Window.Container.AbsolutePosition
-        dragInfo.offset = Vector2.new(dragInfo.startPos.X - absPos.X, dragInfo.startPos.Y - absPos.Y)
+    if (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch) and not isMinimized then
+        isDragging = true
+        local mousePos = UIS:GetMouseLocation()
+        local containerPos = Window.Container.AbsolutePosition
+        dragOffset = mousePos - containerPos
     end
 end)
 
 UIS.InputEnded:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then
-        dragInfo.isDragging = false
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        isDragging = false
     end
 end)
 
--- 实时更新窗口位置（通过RenderStepped确保流畅）
 RunService.RenderStepped:Connect(function()
-    if not dragInfo.isDragging then return end
-    local currentMousePos = UIS:GetMouseLocation()
-    local viewSize = UIS.ViewSize
+    if not isDragging then return end
+    local mousePos = UIS:GetMouseLocation()
+    local newPos = mousePos - dragOffset
+    local screenSize = UIS.ViewSize
     local containerSize = Window.Container.AbsoluteSize
-    
-    -- 限制窗口在屏幕内（避免拖拽出界）
-    local maxX = viewSize.X - containerSize.X
-    local maxY = viewSize.Y - containerSize.Y
-    local newX = math.clamp(currentMousePos.X - dragInfo.offset.X, 0, maxX)
-    local newY = math.clamp(currentMousePos.Y - dragInfo.offset.Y, 0, maxY)
-    
-    Window.Container.Position = UDim2.new(0, newX, 0, newY)
+    -- 限制窗口在屏幕内
+    newPos = Vector2.new(
+        math.clamp(newPos.X, 0, screenSize.X - containerSize.X),
+        math.clamp(newPos.Y, 0, screenSize.Y - containerSize.Y)
+    )
+    Window.Container.Position = UDim2.new(0, newPos.X, 0, newPos.Y)
 end)
 
--- 6. 最小化/恢复逻辑
+-- 最小化/恢复逻辑
 MinBtn.MouseButton1Click:Connect(function()
     if not isMinimized then
         Window.Container.Visible = false
-        -- 创建恢复按钮（左下角黑色风格）
         RestoreButton = Instance.new("TextButton")
         RestoreButton.Name = "RestoreButton"
         RestoreButton.Text = "伊尔德 DANGER"
@@ -132,10 +123,10 @@ MinBtn.MouseButton1Click:Connect(function()
     end
 end)
 
--- 7. 关闭逻辑
+-- 关闭逻辑
 CloseBtn.MouseButton1Click:Connect(function()
     if RestoreButton then RestoreButton:Destroy() end
     Window.Container:Destroy()
 end)
 
-print("✅ 伊尔德 DANGER UI 加载完成（拖拽功能已优化）")
+print("✅ 伊尔德 DANGER UI 加载完成（拖拽功能已修复）")
