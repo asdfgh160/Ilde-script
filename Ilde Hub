@@ -1,0 +1,126 @@
+-- 伊尔德Hub UI（保留原尺寸外观+新增最小化功能）
+local VenusUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/Stefanuk12/Venyx-UI-Library/main/source.lua"))()
+
+local Window = VenusUI.new("伊尔德Hub", 5013109572)
+local isMinimized = false
+local RestoreButton
+
+-- 1. 主窗口容器（保留原配置：700x500+深色+初始位置）
+Window.Container.Size = UDim2.new(0, 700, 0, 500)
+Window.Container.BackgroundColor3 = Color3.new(0.08, 0.08, 0.08)
+Window.Container.BackgroundTransparency = 0.1
+Window.Container.Position = UDim2.new(0.1, 0, 0.1, 0)
+Window.Container.ZIndex = 100
+
+-- 2. 主标题栏（保留原配置：35px高+深色背景）
+local TitleBar = Instance.new("Frame")
+TitleBar.Name = "TitleBar"
+TitleBar.Size = UDim2.new(1, 0, 0, 35)
+TitleBar.Position = UDim2.new(0, 0, 0, 0)
+TitleBar.BackgroundColor3 = Color3.new(0.05, 0.05, 0.05)
+TitleBar.ZIndex = 101
+TitleBar.Parent = Window.Container
+
+-- 标题文本（保留原配置）
+local TitleText = Instance.new("TextLabel")
+TitleText.Name = "TitleText"
+TitleText.Text = "伊尔德Hub（标题栏可拖拽）"
+TitleText.Size = UDim2.new(1, -100, 1, 0)
+TitleText.Position = UDim2.new(0, 10, 0, 0)
+TitleText.BackgroundTransparency = 1
+TitleText.TextColor3 = Color3.new(1, 1, 1)
+TitleText.TextScaled = true
+TitleText.ZIndex = 102
+TitleText.Parent = TitleBar
+
+-- 3. 最小化按钮（新增，保留原风格）
+local MinimizeButton = Instance.new("TextButton")
+MinimizeButton.Name = "MinimizeButton"
+MinimizeButton.Text = "—"
+MinimizeButton.Size = UDim2.new(0, 35, 0, 30)
+MinimizeButton.Position = UDim2.new(1, -75, 0, 2.5)
+MinimizeButton.BackgroundColor3 = Color3.new(0.15, 0.15, 0.15)
+MinimizeButton.TextColor3 = Color3.new(1, 1, 1)
+MinimizeButton.TextScaled = true
+MinimizeButton.ZIndex = 103
+MinimizeButton.Parent = TitleBar
+
+-- 最小化核心逻辑
+MinimizeButton.MouseButton1Click:Connect(function()
+    if not isMinimized then
+        Window.Container.Visible = false
+        -- 创建恢复按钮（保留原风格：60x40+左上角）
+        RestoreButton = Instance.new("TextButton")
+        RestoreButton.Name = "RestoreButton"
+        RestoreButton.Text = "显示"
+        RestoreButton.Size = UDim2.new(0, 60, 0, 40)
+        RestoreButton.Position = UDim2.new(0, 10, 0, 10)
+        RestoreButton.BackgroundColor3 = Color3.new(0.05, 0.05, 0.05)
+        RestoreButton.TextColor3 = Color3.new(1, 1, 1)
+        RestoreButton.TextScaled = true
+        RestoreButton.ZIndex = 99999
+        RestoreButton.Parent = game.Players.LocalPlayer.PlayerGui
+
+        -- 恢复逻辑
+        RestoreButton.MouseButton1Click:Connect(function()
+            Window.Container.Visible = true
+            RestoreButton:Destroy()
+            isMinimized = false
+        end)
+
+        isMinimized = true
+    end
+end)
+
+-- 4. 关闭按钮（保留原配置）
+local CloseButton = Instance.new("TextButton")
+CloseButton.Name = "CloseButton"
+CloseButton.Text = "✕"
+CloseButton.Size = UDim2.new(0, 35, 0, 30)
+CloseButton.Position = UDim2.new(1, -35, 0, 2.5)
+CloseButton.BackgroundColor3 = Color3.new(0.2, 0, 0)
+CloseButton.TextColor3 = Color3.new(1, 1, 1)
+CloseButton.TextScaled = true
+CloseButton.ZIndex = 103
+CloseButton.Parent = TitleBar
+
+CloseButton.MouseButton1Click:Connect(function()
+    if RestoreButton then RestoreButton:Destroy() end
+    Window.Container:Destroy()
+end)
+
+-- 5. 全局拖拽逻辑（保留原配置）
+local dragState = {
+    isDragging = false,
+    offset = Vector2.new(0, 0),
+    target = nil
+}
+
+TitleBar.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 and not isMinimized then
+        dragState.isDragging = true
+        dragState.target = Window.Container
+        local mousePos = UIS:GetMouseLocation()
+        local uiAbsPos = Window.Container.AbsolutePosition
+        dragState.offset = Vector2.new(mousePos.X - uiAbsPos.X, mousePos.Y - uiAbsPos.Y)
+    end
+end)
+
+UIS.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragState.isDragging = false
+    end
+end)
+
+game:GetService("RunService").RenderStepped:Connect(function()
+    if not dragState.isDragging or not dragState.target then return end
+    local currentMousePos = UIS:GetMouseLocation()
+    local targetSize = dragState.target.AbsoluteSize
+    local maxX = UIS.ViewSizeX - targetSize.X
+    local maxY = UIS.ViewSizeY - targetSize.Y
+    local newX = math.clamp(currentMousePos.X - dragState.offset.X, 0, maxX)
+    local newY = math.clamp(currentMousePos.Y - dragState.offset.Y, 0, maxY)
+    dragState.target.Position = UDim2.new(0, newX, 0, newY)
+end)
+
+print("✅ 伊尔德Hub UI（保留原尺寸外观+最小化功能）加载成功")
