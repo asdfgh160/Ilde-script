@@ -1,18 +1,35 @@
+-- 伊尔德 DANGER UI 完整脚本（支持拖拽+最小化）
 local UIS = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
 local VenusUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/Stefanuk12/Venyx-UI-Library/main/source.lua"))()
 
+-- 1. 初始化窗口核心配置
 local Window = VenusUI.new("伊尔德 DANGER", 5013109572)
 local isMinimized = false
 local RestoreButton
+local dragInfo = {
+    isDragging = false,
+    startPos = Vector2.new(0, 0),
+    offset = Vector2.new(0, 0)
+}
 
--- 主窗口容器
+-- 2. 主窗口容器（基础样式+黑色边框）
 Window.Container.Size = UDim2.new(0, 700, 0, 500)
 Window.Container.BackgroundColor3 = Color3.new(0.08, 0.08, 0.08)
 Window.Container.BackgroundTransparency = 0.1
 Window.Container.Position = UDim2.new(0.1, 0, 0.1, 0)
 Window.Container.ZIndex = 100
 
--- 主标题栏
+-- 窗口边框（强化警示风格）
+local Border = Instance.new("Frame")
+Border.Name = "WindowBorder"
+Border.Size = UDim2.new(1, 4, 1, 4)
+Border.Position = UDim2.new(0, -2, 0, -2)
+Border.BackgroundColor3 = Color3.new(0, 0, 0)
+Border.ZIndex = 99
+Border.Parent = Window.Container
+
+-- 3. 可拖拽标题栏（核心交互区域）
 local TitleBar = Instance.new("Frame")
 TitleBar.Name = "TitleBar"
 TitleBar.Size = UDim2.new(1, 0, 0, 35)
@@ -24,7 +41,7 @@ TitleBar.Parent = Window.Container
 -- 标题文本
 local TitleText = Instance.new("TextLabel")
 TitleText.Name = "TitleText"
-TitleText.Text = "伊尔德 DANGER（标题栏可拖拽）"
+TitleText.Text = "伊尔德 DANGER | 标题栏可拖拽"
 TitleText.Size = UDim2.new(1, -100, 1, 0)
 TitleText.Position = UDim2.new(0, 10, 0, 0)
 TitleText.BackgroundTransparency = 1
@@ -33,94 +50,92 @@ TitleText.TextScaled = true
 TitleText.ZIndex = 102
 TitleText.Parent = TitleBar
 
--- 最小化按钮（减号样式）
-local MinimizeButton = Instance.new("TextButton")
-MinimizeButton.Name = "MinimizeButton"
-MinimizeButton.Text = "—"
-MinimizeButton.Size = UDim2.new(0, 35, 0, 30)
-MinimizeButton.Position = UDim2.new(1, -75, 0, 2.5)
-MinimizeButton.BackgroundColor3 = Color3.new(0.15, 0.15, 0.15)
-MinimizeButton.TextColor3 = Color3.new(1, 1, 1)
-MinimizeButton.TextScaled = true
-MinimizeButton.ZIndex = 103
-MinimizeButton.Parent = TitleBar
-
--- 最小化核心逻辑
-MinimizeButton.MouseButton1Click:Connect(function()
-    if not isMinimized then
-        Window.Container.Visible = false
-        -- 创建恢复按钮（样式与图片一致）
-        RestoreButton = Instance.new("TextButton")
-        RestoreButton.Name = "RestoreButton"
-        RestoreButton.Text = "伊尔德 DANGER"
-        RestoreButton.Size = UDim2.new(0, 200, 0, 50) -- 调整尺寸匹配风格
-        RestoreButton.Position = UDim2.new(0, 10, 1, -60) -- 左下角位置
-        RestoreButton.BackgroundColor3 = Color3.new(0, 0, 0) -- 黑色背景
-        RestoreButton.TextColor3 = Color3.new(1, 1, 1) -- 白色文字
-        RestoreButton.TextScaled = true
-        RestoreButton.ZIndex = 99999
-        RestoreButton.Parent = game.Players.LocalPlayer.PlayerGui
-
-        -- 恢复逻辑
-        RestoreButton.MouseButton1Click:Connect(function()
-            Window.Container.Visible = true
-            RestoreButton:Destroy()
-            isMinimized = false
-        end)
-
-        isMinimized = true
-    end
-end)
+-- 4. 功能按钮（最小化+关闭）
+-- 最小化按钮
+local MinBtn = Instance.new("TextButton")
+MinBtn.Name = "MinimizeButton"
+MinBtn.Text = "—"
+MinBtn.Size = UDim2.new(0, 35, 0, 30)
+MinBtn.Position = UDim2.new(1, -75, 0, 2.5)
+MinBtn.BackgroundColor3 = Color3.new(0.15, 0.15, 0.15)
+MinBtn.TextColor3 = Color3.new(1, 1, 1)
+MinBtn.TextScaled = true
+MinBtn.ZIndex = 103
+MinBtn.Parent = TitleBar
 
 -- 关闭按钮
-local CloseButton = Instance.new("TextButton")
-CloseButton.Name = "CloseButton"
-CloseButton.Text = "✕"
-CloseButton.Size = UDim2.new(0, 35, 0, 30)
-CloseButton.Position = UDim2.new(1, -35, 0, 2.5)
-CloseButton.BackgroundColor3 = Color3.new(0.2, 0, 0)
-CloseButton.TextColor3 = Color3.new(1, 1, 1)
-CloseButton.TextScaled = true
-CloseButton.ZIndex = 103
-CloseButton.Parent = TitleBar
+local CloseBtn = Instance.new("TextButton")
+CloseBtn.Name = "CloseButton"
+CloseBtn.Text = "✕"
+CloseBtn.Size = UDim2.new(0, 35, 0, 30)
+CloseBtn.Position = UDim2.new(1, -35, 0, 2.5)
+CloseBtn.BackgroundColor3 = Color3.new(0.2, 0, 0)
+CloseBtn.TextColor3 = Color3.new(1, 1, 1)
+CloseBtn.TextScaled = true
+CloseBtn.ZIndex = 103
+CloseBtn.Parent = TitleBar
 
-CloseButton.MouseButton1Click:Connect(function()
-    if RestoreButton then RestoreButton:Destroy() end
-    Window.Container:Destroy()
-end)
-
--- 全局拖拽逻辑
-local dragState = {
-    isDragging = false,
-    offset = Vector2.new(0, 0),
-    target = nil
-}
-
+-- 5. 拖拽逻辑（修复潜在失效问题）
 TitleBar.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 and not isMinimized then
-        dragState.isDragging = true
-        dragState.target = Window.Container
-        local mousePos = UIS:GetMouseLocation()
-        local uiAbsPos = Window.Container.AbsolutePosition
-        dragState.offset = Vector2.new(mousePos.X - uiAbsPos.X, mousePos.Y - uiAbsPos.Y)
+        dragInfo.isDragging = true
+        dragInfo.startPos = UIS:GetMouseLocation()
+        local absPos = Window.Container.AbsolutePosition
+        dragInfo.offset = Vector2.new(dragInfo.startPos.X - absPos.X, dragInfo.startPos.Y - absPos.Y)
     end
 end)
 
 UIS.InputEnded:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 then
-        dragState.isDragging = false
+        dragInfo.isDragging = false
     end
 end)
 
-game:GetService("RunService").RenderStepped:Connect(function()
-    if not dragState.isDragging or not dragState.target then return end
+-- 实时更新窗口位置（通过RenderStepped确保流畅）
+RunService.RenderStepped:Connect(function()
+    if not dragInfo.isDragging then return end
     local currentMousePos = UIS:GetMouseLocation()
-    local targetSize = dragState.target.AbsoluteSize
-    local maxX = UIS.ViewSizeX - targetSize.X
-    local maxY = UIS.ViewSizeY - targetSize.Y
-    local newX = math.clamp(currentMousePos.X - dragState.offset.X, 0, maxX)
-    local newY = math.clamp(currentMousePos.Y - dragState.offset.Y, 0, maxY)
-    dragState.target.Position = UDim2.new(0, newX, 0, newY)
+    local viewSize = UIS.ViewSize
+    local containerSize = Window.Container.AbsoluteSize
+    
+    -- 限制窗口在屏幕内（避免拖拽出界）
+    local maxX = viewSize.X - containerSize.X
+    local maxY = viewSize.Y - containerSize.Y
+    local newX = math.clamp(currentMousePos.X - dragInfo.offset.X, 0, maxX)
+    local newY = math.clamp(currentMousePos.Y - dragInfo.offset.Y, 0, maxY)
+    
+    Window.Container.Position = UDim2.new(0, newX, 0, newY)
 end)
 
-print("✅ 伊尔德 DANGER UI（含风格化恢复按钮）加载成功")
+-- 6. 最小化/恢复逻辑
+MinBtn.MouseButton1Click:Connect(function()
+    if not isMinimized then
+        Window.Container.Visible = false
+        -- 创建恢复按钮（左下角黑色风格）
+        RestoreButton = Instance.new("TextButton")
+        RestoreButton.Name = "RestoreButton"
+        RestoreButton.Text = "伊尔德 DANGER"
+        RestoreButton.Size = UDim2.new(0, 200, 0, 50)
+        RestoreButton.Position = UDim2.new(0, 10, 1, -60)
+        RestoreButton.BackgroundColor3 = Color3.new(0, 0, 0)
+        RestoreButton.TextColor3 = Color3.new(1, 1, 1)
+        RestoreButton.TextScaled = true
+        RestoreButton.ZIndex = 99999
+        RestoreButton.Parent = game.Players.LocalPlayer.PlayerGui
+
+        RestoreButton.MouseButton1Click:Connect(function()
+            Window.Container.Visible = true
+            RestoreButton:Destroy()
+            isMinimized = false
+        end)
+        isMinimized = true
+    end
+end)
+
+-- 7. 关闭逻辑
+CloseBtn.MouseButton1Click:Connect(function()
+    if RestoreButton then RestoreButton:Destroy() end
+    Window.Container:Destroy()
+end)
+
+print("✅ 伊尔德 DANGER UI 加载完成（拖拽功能已优化）")
