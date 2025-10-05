@@ -1,6 +1,5 @@
 -----------------------------------------------------------
--- DANGER Ilde 脚本（LocalScript，适配多注入器）
--- 仅保留文件夹验证：首次创建标记文件夹，非首次直接使用
+-- 整合自定义UI与原脚本功能
 -----------------------------------------------------------
 -- ================ 基础服务与变量 ================
 local Players = game:GetService("Players")
@@ -12,6 +11,26 @@ local UDim2 = UDim2
 local Instance = Instance
 local task = task
 local Enum = Enum
+
+-- ================ 自定义UI创建 ================
+local ScreenGui = Instance.new("ScreenGui")
+local Frame = Instance.new("Frame")
+local ato = Instance.new("TextButton")
+
+ScreenGui.Parent = PlayerGui
+Frame.Name = "CustomFrame"
+Frame.Parent = ScreenGui
+Frame.BackgroundColor3 = Color3.fromRGB(248, 248, 248) -- UI界面颜色
+Frame.Position = UDim2.new(0.326148063, 0, 0.29880476, 0) -- UI界面的生成的位置
+Frame.Size = UDim2.new(0, 392, 0, 500) -- UI的大小
+Frame.Active = true -- 是否一直显示
+Frame.Draggable = true -- 是否拖动
+
+ato.Name = "CustomButton"
+ato.Parent = Frame
+ato.Text = "功能按钮"
+ato.Position = UDim2.new(0.1, 0, 0.1, 0)
+ato.Size = UDim2.new(0.8, 0, 0.1, 0)
 
 -- ================ 加载 Krnl 专用 Venyx UI (推荐) ================
 local VenusUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/Stefanuk12/Venyx-UI-Library/main/source.lua"))()
@@ -104,7 +123,7 @@ end
 
 -- ================ 坐标文件读写（保留功能） ================
 local csvFilePath = getPathFunc and (getPathFunc() .. "/DANGER_Ilde_Coords.csv") or "DANGER_Ilde_Coords.csv"
-local savedCoordinates = readCSVFile()
+local savedCoordinates = {}
 
 local function readCSVFile()
     if not readFunc then return {} end
@@ -202,6 +221,47 @@ FuncTab:addSlider("移动速度", 16, 1, 100, function(Value)
     if humanoid then
         humanoid.WalkSpeed = Value
     end
+end)
+
+-- 4. 脚本管理Tab
+local ScriptTab = Window:addTab("脚本管理")
+ScriptTab:addSection("注入器下载")
+ScriptTab:addButton("复制 Krnl 下载链接", function()
+    setclipboard("http://Krnl.vip")
+    print("✅ Krnl链接已复制")
+end)
+
+ScriptTab:addSection("功能脚本")
+ScriptTab:addButton("执行 飞行脚本", function()
+    loadstring(game:HttpGet("https://pastebin.com/raw/LY9W7CPL"))()
+end)
+
+-- ================ 执行流程（仅保留文件夹验证） ================
+local isFirstUse = not folderExists()
+if isFirstUse then
+    -- 首次使用：创建验证文件夹 → 显示公告
+    createVerifyFolder()
+    showAnnouncement()
+    print("🆕 首次使用：已创建验证文件夹，下次启动将跳过检测")
+else
+    -- 非首次使用：直接显示公告（跳过验证）
+    showAnnouncement()
+    print("✅ 检测到验证文件夹，直接加载功能")
+end
+
+-- ================ 实时坐标更新 ================
+RunService.Heartbeat:Connect(function()
+    local rootPart = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+    if rootPart then
+        local pos = rootPart.Position
+        coordLabel.Text = string.format("实时坐标：X: %.1f, Y: %.1f, Z: %.1f", pos.X, pos.Y, pos.Z)
+    end
+end)
+
+-- 自定义按钮点击事件（可根据需求扩展）
+ato.MouseButton1Click:Connect(function()
+    print("自定义按钮被点击")
+    -- 可在此添加自定义逻辑
 end)
 
 -- 4. 脚本管理Tab
