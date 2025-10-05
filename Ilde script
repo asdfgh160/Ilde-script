@@ -1,0 +1,240 @@
+-----------------------------------------------------------
+-- DANGER Ilde 脚本（LocalScript，适配多注入器）
+-- 仅保留文件夹验证：首次创建标记文件夹，非首次直接使用
+-----------------------------------------------------------
+-- ================ 基础服务与变量 ================
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer or Players.PlayerAdded:Wait()
+local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+local RunService = game:GetService("RunService")
+local Color3 = Color3
+local UDim2 = UDim2
+local Instance = Instance
+local task = task
+local Enum = Enum
+
+-- ================ 加载 Krnl 专用 Venyx UI (推荐) ================
+local VenusUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/Stefanuk12/Venyx-UI-Library/main/source.lua"))()
+local Window = VenusUI.new("DANGER Ilde Hub", 5013109572)  -- 主窗口标题
+print("✅ Venyx UI 加载成功！")
+
+-- ================ 注入器文件操作兼容（核心：文件夹验证 + 坐标保存） ================
+local readFunc, writeFunc, getPathFunc
+pcall(function()
+    if type(syn) == "table" then
+        readFunc = syn.readfile or readfile
+        writeFunc = syn.writefile or writefile
+        getPathFunc = syn.datapath  -- 忍者注入器沙盒路径
+    else
+        readFunc = readfile or readFile
+        writeFunc = writefile or writeFile
+        getPathFunc = function() return "Roblox/Scripts" end  -- 其他注入器默认路径
+    end
+end)
+
+-- ================ 文件夹验证核心逻辑 ================
+-- 1. 获取验证文件夹路径（跨注入器兼容）
+local function getVerifyFolderPath()
+    local basePath
+    if getPathFunc then
+        basePath = getPathFunc()  -- 优先用注入器提供的沙盒路径
+    else
+        -- 降级路径：适配Windows/macOS/Studio
+        basePath = "C:/RobloxScripts"
+        pcall(function()
+            if game:GetService("RunService"):IsStudio() then
+                basePath = "Roblox/Scripts"
+            elseif string.find(game:GetService("MarketplaceService"):GetProductInfo(1).Name, "Mac") then
+                basePath = "~/Library/Roblox/Scripts"
+            end
+        end)
+    end
+    return basePath .. "/DANGER_Ilde_Verify"  -- 验证文件夹名称
+end
+
+-- 2. 检查文件夹是否存在（通过读取标记文件判断）
+local function folderExists()
+    if not readFunc then return false end  -- 无文件操作能力则视为首次使用
+    local folderPath = getVerifyFolderPath()
+    -- 尝试读取文件夹内的标记文件，成功则视为文件夹存在
+    return pcall(function() readFunc(folderPath .. "/.verify") end)
+end
+
+-- 3. 创建验证文件夹（写入空标记文件自动创建文件夹）
+local function createVerifyFolder()
+    if not writeFunc then return end  -- 无写入能力则跳过（下次仍需验证）
+    local folderPath = getVerifyFolderPath()
+    local success = pcall(function()
+        writeFunc(folderPath .. "/.verify", "")  -- 写入空文件，自动创建父文件夹
+        print("✅ 验证文件夹创建成功：" .. folderPath)
+    end)
+    if not success then
+        -- 降级方案：用PlayerGui临时文件夹（仅当前会话有效）
+        local tempFolder = Instance.new("Folder")
+        tempFolder.Name = "DANGER_Ilde_Verify"
+        tempFolder.Parent = PlayerGui
+        print("⚠️  持久化文件夹创建失败，使用临时文件夹（仅当前会话有效）")
+    end
+end
+
+-- ================ 公告弹窗（保留功能） ================
+local function showAnnouncement()
+    local NoticeWindow = VenusUI.new("公告", 5013109572)
+    local NoticeTab = NoticeWindow:addTab("更新日志")
+    NoticeTab:addSection("3.1汉化版 DANGER Ilde 公告")
+    
+    local logText = [[更新日志:
+8月21日05:35更新军事大亨去除GB失效脚本全自动农场脚本挂机即可
+8月21日10:07更新墨水游戏新版老外Xa包括使用教程获取方法和注意事项
+8月21日00:58更新WARMIX[PVP FPS 武器战斗射击枪]-保护房屋免受怪物侵害-保护总统
+8月22日18:17添加了chain服务器脚本
+9月12日更新墨水游戏汉化脚目前作者已学会汉化逐渐汉化中
+9月13日10:00更新新的墨水游戏汉化去除墨水游戏过期脚本去除ink-game正常版添加ink-game测试版汉化
+9月13日16:12全面取消汉化更新新的方法等待半天新更新了Xa链接修复过期
+9月13日23:08更新一键汉化脚本打开脚本点击按钮将进行汉化目前只支持墨水游戏ax或ink-game和RINGTA一键汉化脚本在墨水游戏菜单(禁止拿去圈💰尤其是知道源码地址的人)
+9月14日12:23添加了最强战场汉化还是在一键汉化脚本里面，还是在墨水菜单]]
+    
+    NoticeTab:addLabel(logText)
+    NoticeTab:addButton("我知道了", function()
+        NoticeWindow:close()
+    end)
+    
+    while NoticeWindow.gui.Parent do task.wait() end
+end
+
+-- ================ 坐标文件读写（保留功能） ================
+local csvFilePath = getPathFunc and (getPathFunc() .. "/DANGER_Ilde_Coords.csv") or "DANGER_Ilde_Coords.csv"
+local savedCoordinates = readCSVFile()
+
+local function readCSVFile()
+    if not readFunc then return {} end
+    local success, content = pcall(readFunc, csvFilePath)
+    if not success or not content then return {} end
+    local coords = {}
+    for i, line in ipairs(content:split("\n")) do
+        if i > 1 and line ~= "" then
+            local parts = line:split(",")
+            if #parts == 4 then
+                table.insert(coords, {
+                    name = parts[1],
+                    x = tonumber(parts[2]),
+                    y = tonumber(parts[3]),
+                    z = tonumber(parts[4])
+                })
+            end
+        end
+    end
+    return coords
+end
+
+local function writeCSVFile()
+    if not writeFunc then return end
+    local csv = "名称,X坐标,Y坐标,Z坐标\n"
+    for _, coord in ipairs(savedCoordinates) do
+        csv ..= string.format("%s,%.2f,%.2f,%.2f\n", coord.name, coord.x, coord.y, coord.z)
+    end
+    pcall(writeFunc, csvFilePath, csv)
+end
+
+-- ================ 核心功能Tab创建（基于Venyx UI） ================
+-- 1. 坐标管理Tab
+local CoordTab = Window:addTab("坐标管理")
+CoordTab:addSection("实时坐标")
+local coordLabel = CoordTab:addLabel("实时坐标：X: ---, Y: ---, Z: ---")
+
+CoordTab:addSection("坐标操作")
+local coordName = ""
+CoordTab:addTextbox("坐标名称", "输入坐标名称", function(Value)
+    coordName = Value
+end)
+
+CoordTab:addButton("保存坐标", function()
+    local rootPart = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+    if not rootPart then
+        warn("角色未加载")
+        return
+    end
+    local pos = rootPart.Position
+    local name = coordName ~= "" and coordName or "未命名坐标"
+    table.insert(savedCoordinates, {name = name, x = pos.X, y = pos.Y, z = pos.Z})
+    writeCSVFile()
+    print(string.format("✅ 保存坐标：%s (X:%.1f, Y:%.1f, Z:%.1f)", name, pos.X, pos.Y, pos.Z))
+end)
+
+-- 2. 玩家传送Tab
+local PlayerTab = Window:addTab("玩家传送")
+PlayerTab:addSection("在线玩家")
+local function refreshPlayerList()
+    -- 清理旧按钮
+    for _, child in ipairs(PlayerTab.sectionFrames["在线玩家"].Frame:GetChildren()) do
+        if child:IsA("TextButton") and child.Name:match("PlayerBtn") then
+            child:Destroy()
+        end
+    end
+    -- 添加新玩家按钮
+    for _, player in ipairs(Players:GetPlayers()) do
+        if player ~= LocalPlayer then
+            PlayerTab:addButton("传送至 " .. player.Name, function()
+                local rootPart = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+                local targetRoot = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+                if rootPart and targetRoot then
+                    rootPart.CFrame = targetRoot.CFrame
+                end
+            end)
+        end
+    end
+end
+refreshPlayerList()
+PlayerTab:addButton("刷新玩家列表", refreshPlayerList)
+
+-- 3. 通用功能Tab
+local FuncTab = Window:addTab("通用功能")
+FuncTab:addSection("基础功能")
+FuncTab:addToggle("飞行模式", false, function(State)
+    local humanoid = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid")
+    if humanoid then
+        humanoid.Fly = State
+    end
+end)
+
+FuncTab:addSlider("移动速度", 16, 1, 100, function(Value)
+    local humanoid = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid")
+    if humanoid then
+        humanoid.WalkSpeed = Value
+    end
+end)
+
+-- 4. 脚本管理Tab
+local ScriptTab = Window:addTab("脚本管理")
+ScriptTab:addSection("注入器下载")
+ScriptTab:addButton("复制 Krnl 下载链接", function()
+    setclipboard("http://Krnl.vip")
+    print("✅ Krnl链接已复制")
+end)
+
+ScriptTab:addSection("功能脚本")
+ScriptTab:addButton("执行 飞行脚本", function()
+    loadstring(game:HttpGet("https://pastebin.com/raw/LY9W7CPL"))()
+end)
+
+-- ================ 执行流程（仅保留文件夹验证） ================
+local isFirstUse = not folderExists()
+if isFirstUse then
+    -- 首次使用：创建验证文件夹 → 显示公告
+    createVerifyFolder()
+    showAnnouncement()
+    print("🆕 首次使用：已创建验证文件夹，下次启动将跳过检测")
+else
+    -- 非首次使用：直接显示公告（跳过验证）
+    showAnnouncement()
+    print("✅ 检测到验证文件夹，直接加载功能")
+end
+
+-- ================ 实时坐标更新 ================
+RunService.Heartbeat:Connect(function()
+    local rootPart = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+    if rootPart then
+        local pos = rootPart.Position
+        coordLabel.Text = string.format("实时坐标：X: %.1f, Y: %.1f, Z: %.1f", pos.X, pos.Y, pos.Z)
+    end
+end)
