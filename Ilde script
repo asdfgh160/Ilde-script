@@ -1,0 +1,54 @@
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer or Players.PlayerAdded:Wait()
+local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+local RunService = game:GetService("RunService")
+
+-- 加载原始UI框架
+local VenusUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/Stefanuk12/Venyx-UI-Library/main/source.lua"))()
+-- 设置名称为“DANGER Ilde Hub”并开启拖拽功能
+local MainWindow = VenusUI.new("DANGER Ilde Hub", 5013109572)
+MainWindow.Draggable = true
+
+-- 坐标管理核心功能
+local coordPath = "Ilde_Coords.csv"
+local savedCoords = {}
+
+local function saveCoord(name, x, y, z)
+    table.insert(savedCoords, {name = name, x = x, y = y, z = z})
+end
+
+-- 主UI Tab（保留原始风格）
+local CoordTab = MainWindow:addTab("坐标管理")
+local coordLabel = CoordTab:addLabel("X: ---, Y: ---, Z: ---")
+local coordName = ""
+CoordTab:addTextbox("坐标名称", "输入名称", function(val) coordName = val end)
+CoordTab:addButton("保存坐标", function()
+    local root = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+    if root then saveCoord(coordName or "未命名", root.Position.X, root.Position.Y, root.Position.Z) end
+end)
+
+local PlayerTab = MainWindow:addTab("玩家传送")
+local function refreshPlayers()
+    for _, child in ipairs(PlayerTab.sectionFrames["在线玩家"].Frame:GetChildren()) do
+        if child:IsA("TextButton") then child:Destroy() end
+    end
+    for _, p in ipairs(Players:GetPlayers()) do
+        if p ~= LocalPlayer then
+            PlayerTab:addButton("传送至 " .. p.Name, function()
+                local root = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+                local targetRoot = p.Character and p.Character:FindFirstChild("HumanoidRootPart")
+                if root and targetRoot then root.CFrame = targetRoot.CFrame end
+            end)
+        end
+    end
+end
+refreshPlayers()
+PlayerTab:addButton("刷新列表", refreshPlayers)
+
+-- 实时坐标更新
+RunService.Heartbeat:Connect(function()
+    local root = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+    if root then
+        coordLabel.Text = string.format("X: %.1f, Y: %.1f, Z: %.1f", root.Position.X, root.Position.Y, root.Position.Z)
+    end
+end)
