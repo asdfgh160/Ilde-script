@@ -1,7 +1,7 @@
 local Window = WindUI:CreateWindow({
-    Title = "DANGER Ilde",
+    Title = "My Super Hub",
     Icon = "door-open", -- lucide icon
-    Author = "by 伊尔德",
+    Author = "by .ftgs and .ftgs",
     Folder = "MySuperHub",
     
     -- ↓ This all is Optional. You can remove it.
