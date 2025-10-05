@@ -1,59 +1,54 @@
+-- 1. 先加载 WindUI 框架（使用常见的公开加载链接，确保执行环境支持 HttpGet）
+if not WindUI then
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/WindUI-Roblox/Framework/main/Loader.lua"))()
+end
+
+-- 2. 创建可显示的窗口（保留核心功能，优化配置使其更易测试）
 local Window = WindUI:CreateWindow({
-    Title = "My Super Hub",
-    Icon = "door-open", -- lucide icon
-    Author = "by .ftgs and .ftgs",
-    Folder = "MySuperHub",
-    
-    -- ↓ This all is Optional. You can remove it.
-    Size = UDim2.fromOffset(580, 460),
-    MinSize = Vector2.new(560, 350),
-    MaxSize = Vector2.new(850, 560),
-    Transparent = true,
-    Theme = "Dark",
-    Resizable = true,
-    SideBarWidth = 200,
-    BackgroundImageTransparency = 0.42,
-    HideSearchBar = true,
-    ScrollBarEnabled = false,
-    
-    -- ↓ Optional. You can remove it.
-    --[[ You can set 'rbxassetid://' or video to Background.
-        'rbxassetid://':
-            Background = "rbxassetid://", -- rbxassetid
-        Video:
-            Background = "video:YOUR-RAW-LINK-TO-VIDEO.webm", -- video 
-    --]]
-    
-    -- ↓ Optional. You can remove it.
+    Title = "My Super Hub",          -- 窗口标题（必选）
+    Icon = "door-open",              -- Lucide 图标（需 WindUI 内置支持）
+    Author = "by .ftgs and .ftgs",   -- 作者信息（显示在窗口内）
+    Folder = "MySuperHub",           -- 窗口存储文件夹（Roblox 内路径）
+
+    -- 基础显示配置（必选/优化，确保窗口可见）
+    Size = UDim2.fromOffset(580, 460),-- 初始尺寸（宽×高）
+    MinSize = Vector2.new(560, 350), -- 最小尺寸（防止缩太小）
+    MaxSize = Vector2.new(850, 560), -- 最大尺寸（防止拉太大）
+    Transparent = true,              -- 窗口透明（视觉效果）
+    Theme = "Dark",                  -- 深色主题（默认适配，更易看清）
+    Resizable = true,                -- 允许拖动调整大小（方便测试）
+    SideBarWidth = 200,              -- 侧边栏宽度（显示菜单/功能列表）
+    BackgroundImageTransparency = 0.42, -- 背景透明度（0=不透明，1=完全透明）
+    HideSearchBar = true,            -- 隐藏搜索栏（简化界面，专注显示）
+    ScrollBarEnabled = false,        -- 禁用滚动条（当前无长内容，避免多余元素）
+
+    -- 测试用背景（补全示例，让窗口背景不空白）
+    Background = "rbxassetid://123456789", -- 替换为真实图片ID（如 Roblox 免费图片）
+    -- 若想测试视频背景，可替换为：Background = "video:https://example.com/test.webm"
+
+    -- 用户模块（保留点击反馈，测试时能看到效果）
     User = {
-        Enabled = true,
-        Anonymous = true,
-        Callback = function()
-            print("clicked")
+        Enabled = true,              -- 启用用户模块
+        Anonymous = true,            -- 匿名模式（无需登录）
+        Callback = function()        -- 点击用户按钮的反馈（测试用）
+            print("User button clicked!") -- 控制台打印（验证功能正常）
+            WindUI:Notify("You clicked the user button!", "Success") -- 窗口内弹窗提示
         end,
     },
-    
-    --       remove this all, 
-    -- !  ↓  if you DON'T need the key system
-    KeySystem = { 
-        -- ↓ Optional. You can remove it.
-        Key = { "1234", "5678" },
-        
-        Note = "Example Key System.",
-        
-        -- ↓ Optional. You can remove it.
+
+    -- 密钥系统（保留基础功能，方便测试验证）
+    KeySystem = {
+        Key = { "1234", "5678" },    -- 测试用密钥（输入可解锁）
+        Note = "Enter test key: 1234 or 5678", -- 提示文字（告诉用户用什么密钥）
         Thumbnail = {
-            Image = "rbxassetid://",
-            Title = "Thumbnail",
+            Image = "rbxassetid://987654321", -- 密钥界面图标（替换为真实ID）
+            Title = "Unlock Hub",     -- 图标标题（显示在密钥输入框上方）
         },
-        
-        -- ↓ Optional. You can remove it.
-        URL = "YOUR LINK TO GET KEY (Discord, Linkvertise, Pastebin, etc.)",
-        
-        -- ↓ Optional. You can remove it.
-        SaveKey = false, -- automatically save and load the key.
-        
-        -- ↓ Optional. You can remove it.
-        -- API = {} ← Services. Read about it below ↓
+        URL = "https://discord.gg/yourserver", -- 密钥获取链接（测试用示例）
+        SaveKey = false,             -- 不自动保存密钥（每次测试都需输入，方便验证）
     },
 })
+
+-- 3. 额外添加窗口显示确认（确保代码执行后有反馈）
+print("Window created successfully! Check your Roblox screen.")
+WindUI:Notify("My Super Hub is ready!", "Info") -- 窗口弹出提示（直接告知用户窗口已显示）
