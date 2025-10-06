@@ -27,19 +27,19 @@ end
 local Confirmed = false
 
 WindUI:Popup({
-    Title = "Welcome! Popup Example",
+    Title = "伊尔德 DANGER 脚本",
     Icon = "rbxassetid://129260712070622",
     IconThemed = true,
-    Content = "This is an Example UI for the " .. gradient("WindUI", Color3.fromHex("#00FF87"), Color3.fromHex("#60EFFF")) .. " Lib",
+    Content = "本人的QQ号" .. gradient("2137844138", Color3.fromHex("#00FF87"), Color3.fromHex("#60EFFF")) .. " 本人创建的群聊".. gradient("555044756", Color3.fromHex("#00FF87"), Color3.fromHex("#60EFFF")) ..
     Buttons = {
         {
-            Title = "Cancel",
+            Title = "拒绝",
             --Icon = "",
             Callback = function() end,
             Variant = "Secondary", -- Primary, Secondary, Tertiary
         },
         {
-            Title = "Continue",
+            Title = "确认",
             Icon = "arrow-right",
             Callback = function() Confirmed = true end,
             Variant = "Primary", -- Primary, Secondary, Tertiary
@@ -52,10 +52,10 @@ repeat wait() until Confirmed
 --
 
 local Window = WindUI:CreateWindow({
-    Title = "WindUI Library",
+    Title = "伊尔德 DANGER 脚本",
     Icon = "rbxassetid://129260712070622",
     IconThemed = true,
-    Author = "Example UI",
+    Author = "主要区域",
     Folder = "CloudHub",
     Size = UDim2.fromOffset(580, 460),
     Transparent = true,
@@ -90,7 +90,7 @@ Window:CreateTopbarButton("MyCustomButton2", "droplet-off",  function() print("c
 Window:CreateTopbarButton("MyCustomButton3", "battery-plus", function() Window:ToggleFullscreen() end, 988)
 
 Window:EditOpenButton({
-    Title = "Open Example UI",
+    Title = "伊尔德 DANGER 脚本",
     Icon = "monitor",
     CornerRadius = UDim.new(0,16),
     StrokeThickness = 2,
