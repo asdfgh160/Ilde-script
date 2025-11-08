@@ -109,6 +109,7 @@ local Translations = {
      ["JobId"] = "任务ID",
      ["Copy JobId"] = "复制任务ID",
      ["Copy discord"] = "复制Discord链接",
+     ["https://discord.gg/TS5mYeEe"] = "https://discord.gg/GKus4erK",
      ["Menu Settings"] = "菜单设置",
      ["Custom Cursor"] = "自定义光标",
      ["DPI Scale"] = "DPI缩放",
