@@ -1,4 +1,7 @@
-local Translations = {
+-- 快速启动封装（不修改原有代码）
+(function()
+    -- 原有完整代码（无任何改动）
+    local Translations = {
 ["Open RINGTA SCRIPTS"] = "打开RlNGTA汉化脚本",
     ["RINGTA SCRIPTS"] = "被遗弃后汉化脚本",
     ["RINGTA and BUBLIK6241"] = "by 伊尔德",
@@ -97,7 +100,6 @@ local Translations = {
     ["Announcement"] = "公告",
     ["HAPPY HALLOWEEN"] = "QQ群555044756/快手和B站上都有号，后面还会汉化，其他的脚本，目前这个脚本已经是全部汉化完，只有一小部分，因为无法汉化，就算修复后也无法汉化，还会导致脚本无法正常启动，所以这边并没有汉化，你可以使用其他类似的功能"
 }
-
 local keys = {}
 for k in pairs(Translations) do
     table.insert(keys, k)
@@ -108,7 +110,6 @@ table.sort(
         return #a > #b
     end
 )
-
 local function safeReplace(text, old, new)
     local result = ""
     local start = 1
@@ -123,7 +124,6 @@ local function safeReplace(text, old, new)
     end
     return result
 end
-
 local function translateText(text)
     if not text or type(text) ~= "string" then
         return text
@@ -133,7 +133,6 @@ local function translateText(text)
     end
     return text
 end
-
 local oldNewIndex
 oldNewIndex =
     hookmetamethod(
@@ -146,5 +145,8 @@ oldNewIndex =
         return oldNewIndex(self, key, value)
     end
 )
-
 loadstring(game:HttpGet("https://raw.githubusercontent.com/wefwef127382/forsakenloader.github.io/refs/heads/main/RINGTABUBLIK.lua"))()
+
+    -- 快速启动触发（无需额外操作，加载脚本即执行）
+    print("脚本已快速启动，汉化功能已激活！")
+end)()
