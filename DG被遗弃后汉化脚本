@@ -1,0 +1,150 @@
+local Translations = {
+["Open RINGTA SCRIPTS"] = "打开RlNGTA汉化脚本",
+    ["RINGTA SCRIPTS"] = "被遗弃后汉化脚本",
+    ["RINGTA and BUBLIK6241"] = "by 伊尔德",
+    ["Close Window"] = "关闭窗口",
+    ["Do you want to close this window? You will not be able to open it again."] = "你是否要关闭此窗口？关闭后将无法再次打开。",
+    ["Cancel"] = "取消",
+    ["Stamina_Settings"] = "体力设置",
+    ["Esp"] = "透视功能",
+    ["Auto Block"] = "自动格挡",
+    ["Misc"] = "杂项功能",
+    ["Auto_Stun"] = "自动眩晕",
+    ["Random"] = "随机功能",
+    ["Hitbox_expander"] = "碰撞箱扩展器",
+    ["Generator"] = "发电机功能",
+    ["Teleport"] = "传送功能",
+    ["AI"] = "AI代打",
+    ["Settings"] = "设置",
+    ["Credits"] = "信息页",
+    ["Infinite Stamina"] = "无限体力",
+    ["Max Stamina"] = "最大体力",
+    ["Minimum Stamina"] = "最小体力",
+    ["Sprint Speed"] = "冲刺速度",
+    ["Stamina Gain"] = "体力恢复速率",
+    ["Stamina Drain"] = "体力消耗速率",
+    ["Regen Delay"] = "恢复延迟",
+    ["ESP Killer"] = "杀手透视",
+    ["ESP Survivors"] = "幸存者透视",
+    ["ESP Medkit"] = "医疗包透视",
+    ["ESP BloxyCola"] = "Bloxy可乐道具透视",
+    ["Esp Back of the killer (two time)"] = "杀手背部透视（双倍效果）",
+    ["ESP Generators"] = "发电机透视",
+    ["Sentry/Dispenser ESP"] = "哨戒炮/补给器透视",
+    ["Auto Block(animation)"] = "自动格挡（带动画）",
+    ["Detection Range(Animation)"] = "检测范围（动画）",
+    ["Windup %"] = "蓄力进度",
+    ["Load Auto Block (Audio)"] = "加载自动格挡（音效）",
+    ["Auto Punch"] = "自动出拳",
+    ["Aim Mode"] = "瞄准模式",
+    ["Fling Power"] = "抛投力度",
+    ["Prediction Time"] = "预判时间",
+    ["Hitbox Dragging Tech"] = "碰撞箱拖拽技术",
+    ["BodyVelocity Speed"] = "身体移动速度",
+    ["Load Auto Clon (Auto Clon 007n7)"] = "加载自动克隆（007n7版自动克隆）",
+    ["ms checker"] = "延迟检测器",
+    ["Normal is NOT Legit"] = "Normal模式不自然",
+    ["Normal+Anti Bait is Blatant"] = "Normal+防引诱模式过于明显",
+    ["Normal+Anti Bait V2 is Legit For pro players that need to look Legit"] = "Normal+防引诱V2模式适合需伪装成高手的玩家",
+    ["Chat visibility"] = "聊天可见性",
+    ["Fullbright"] = "全亮度显示",
+    ["Anti Fog"] = "防雾效果",
+    ["Remove Effects"] = "移除特效",
+    ["Anti Slow"] = "防减速",
+    ["Anti Stun"] = "防眩晕",
+    ["Load Invisibility"] = "加载隐身功能",
+    ["Auto Close 1×1×1×1Popups"] = "自动关闭1×1×1×1弹窗",
+    ["VoidRush No-Crash"] = "防崩溃",
+    ["Void Rush full Control (Noli)"] = "完全控制（Noli版）",
+    ["Auto Eat Pizza"] = "自动吃披萨",
+    ["HP Threshold"] = "生命值阈值",
+    ["Auto heal Teammates (Elliot)"] = "自动治疗队友（Elliot版）",
+    ["Hitbox visualization"] = "碰撞箱可视化",
+    ["Load Auto Invisibility(007n7)"] = "加载自动隐身（007n7版）",
+    ["Load Auto Invisibility(Two Time)"] = "加载自动隐身（Two Time版）",
+    ["Load Auto Invisibility(Noob)"] = "加载自动隐身（Noob版）",
+    ["Silent Aim(c00lKid/Dusekkar)"] = "静默瞄准（c00lKid/Dusekkar版）",
+    ["Auto Stun Killer(Chance)"] = "自动眩晕杀手（Chance版）",
+    ["Chance Aimbot"] = "Chance自瞄",
+    ["Sharpness (high ping => 4)"] = "锐度（高延迟时设为4）",
+    ["Load Auto Parry"] = "加载自动格挡反击",
+    ["Load Backstab (Two Time)"] = "加载背刺功能（Two Time版）",
+    ["Fling (works only on killer)"] = "抛掷（仅对杀手生效）",
+    ["Aimbot"] = "自瞄",
+    ["Load Orbit"] = "加载环绕功能",
+    ["Speed Boost(Like Eliot's Rush Hour)"] = "速度增益（类似Eliot的高峰时刻效果）",
+    ["Kill aura (killer)"] = "击杀光环（杀手专用）",
+    ["Load Hide Names"] = "加载隐藏名称",
+    ["Fake animation(Guest)"] = "伪造动画（访客模式）",
+    ["Load Custom Lms"] = "加载自定义Lms",
+    ["Load Anti Sentry"] = "加载反哨戒炮",
+    ["Auto Delete John Doe Spikes"] = "自动删除John Doe尖刺",
+    ["Random Skin For Guest"] = "访客随机皮肤",
+    ["Load Hitbox Expander V12(expands where u looking at working better with Guest)"] = "加载碰撞箱扩展器V12（扩展视野区域，访客模式更适配）",
+    ["Load Reach (New)"] = "加载攻击距离扩展（新版）",
+    ["Load Punch Hitbox Expander"] = "加载出拳碰撞箱扩展器",
+    ["Fix generator manual"] = "手动修复发电机",
+    ["Auto Fix Generators"] = "自动修复发电机",
+    ["Tp to Killer"] = "传送至杀手",
+    ["Tp to Survivor"] = "传送至幸存者",
+    ["Tp to Generator"] = "传送至发电机",
+    ["Tp to Medkit"] = "传送至医疗包",
+    ["Tp to BloxyCola"] = "传送至Bloxy可乐",
+    ["AI PLAY"] = "AI代打",
+    ["Use With Noclip"] = "配合穿墙功能使用",
+    ["Set Toggle Key(Close open ui for pc)"] = "设置切换按键（PC端用于开关界面）",
+    ["JOIN DISCORD SERVER RINGTA"] = "加入RINGTA的Discord服务器",
+    ["Announcement"] = "公告",
+    ["HAPPY HALLOWEEN"] = "QQ群555044756/快手和B站上都有号，后面还会汉化，其他的脚本，目前这个脚本已经是全部汉化完，只有一小部分，因为无法汉化，就算修复后也无法汉化，还会导致脚本无法正常启动，所以这边并没有汉化，你可以使用其他类似的功能"
+}
+
+local keys = {}
+for k in pairs(Translations) do
+    table.insert(keys, k)
+end
+table.sort(
+    keys,
+    function(a, b)
+        return #a > #b
+    end
+)
+
+local function safeReplace(text, old, new)
+    local result = ""
+    local start = 1
+    while true do
+        local i, j = string.find(text, old, start, true)
+        if not i then
+            result = result .. string.sub(text, start)
+            break
+        end
+        result = result .. string.sub(text, start, i - 1) .. new
+        start = j + 1
+    end
+    return result
+end
+
+local function translateText(text)
+    if not text or type(text) ~= "string" then
+        return text
+    end
+    for _, k in ipairs(keys) do
+        text = safeReplace(text, k, Translations[k])
+    end
+    return text
+end
+
+local oldNewIndex
+oldNewIndex =
+    hookmetamethod(
+    game,
+    "__newindex",
+    function(self, key, value)
+        if key == "Text" and type(value) == "string" then
+            value = translateText(value)
+        end
+        return oldNewIndex(self, key, value)
+    end
+)
+
+loadstring(game:HttpGet("https://raw.githubusercontent.com/wefwef127382/forsakenloader.github.io/refs/heads/main/RINGTABUBLIK.lua"))()
