@@ -18,7 +18,7 @@ local Translations = {
     ["Autowin"] = "自动获胜",
     ["Toggle"] = "打开脚本",
     ["Lock"] = "锁定",
-    ["Main"] = "关卡功能",
+    ["Main"] = "主功能",
     ["Combat"] = "战斗",
     ["Misc"] = "杂项",
     ["UI Settings"] = "UI设置",
@@ -113,7 +113,6 @@ local Translations = {
     ["Custom Cursor"] = "自定义光标",
     ["DPI Scale"] = "DPI缩放",
     ["Menu Keybind"] = "菜单按键绑定",
-    
     ["RightShift"] = "右Shift键",
     ["Unload"] = "卸载",
     ["Config"] = "配置"
@@ -123,6 +122,7 @@ local keys = {}
 for k in pairs(Translations) do
     table.insert(keys, k)
 end
+-- 按字符串长度降序排序，避免短键覆盖长键
 table.sort(keys, function(a, b)
     return #a > #b
 end)
@@ -143,7 +143,7 @@ local function safeReplace(text, old, new)
 end
 
 local function translateText(text)
-    if not text or type(text) ~= "string" then
+    if type(text) ~= "string" or text == "" then
         return text
     end
     for _, k in ipairs(keys) do
@@ -152,15 +152,33 @@ local function translateText(text)
     return text
 end
 
--- 修复钩子作用范围，避免全局拦截
-local oldNewIndex = hookmetamethod(game, "__newindex", function(self, key, value)
-    if self:IsA("TextLabel") or self:IsA("TextButton") or self:IsA("TextBox") then
-        if key == "Text" and type(value) == "string" then
-            value = translateText(value)
-        end
+-- 修复hookmetamethod兼容问题，添加错误捕获
+local success, oldNewIndex = pcall(hookmetamethod, game, "__newindex", function(self, key, value)
+    -- 仅拦截UI文本控件的Text属性
+    if (self:IsA("TextLabel") or self:IsA("TextButton") or self:IsA("TextBox")) and key == "Text" then
+        value = translateText(value)
     end
     return oldNewIndex(self, key, value)
 end)
 
--- 修复远程脚本链接格式
-loadstring(game:HttpGet("https://raw.githubusercontent.com/eikikrkr-ux/bypasok/refs/heads/main/ok"))()
+-- 若hook失败，切换为批量翻译模式
+if not success then
+    warn("钩子加载失败，切换到批量翻译模式")
+    -- 等待目标脚本加载
+    task.wait(2)
+    -- 遍历所有UI文本控件进行翻译
+    for _, gui in ipairs(game:GetService("Players").LocalPlayer.PlayerGui:GetDescendants()) do
+        if gui:IsA("TextLabel") or gui:IsA("TextButton") or gui:IsA("TextBox") then
+            gui.Text = translateText(gui.Text)
+        end
+    end
+end
+
+-- 修复远程脚本加载：补充闭合括号，确保链接有效
+local remoteScriptUrl = "https://raw.githubusercontent.com/eikikrkr-ux/bypasok/refs/heads/main/ok"
+local successLoad = pcall(function()
+    loadstring(game:HttpGet(remoteScriptUrl))()
+end)
+if not successLoad then
+    warn("远程脚本加载失败，请检查链接是否有效")
+end
