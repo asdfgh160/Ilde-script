@@ -1,9 +1,7 @@
 local Translations = {
      ["Info & Credits"] = "信息与致谢",
-     ["BorenHub TEAM - Python / Lua"] = "欢迎你使用伊尔德汉化墨水Boren脚本，
-本人在快手和B站上都有号，可以关注我，
-后面还会出更多的汉化脚本",
-     ["Thanks for using BorenHub!"] = "感谢使用汉化脚本Boren！",
+     ["BorenHub TEAM - Python / Lua"] = "欢迎你使用汉化Boren脚本，这个脚本由本人亲自汉化，快手上和B站上都有号",
+     ["Thanks for using BorenHub!"] = "感谢使用汉化BorenHub！",
      ["Executor: Krnl"] = "执行器：Krnl",
      ["JobId"] = "任务ID"
 }
