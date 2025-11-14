@@ -1,0 +1,63 @@
+local Translations = {     
+     ["墨水游戏汉化脚本"] = "Boren汉化脚本",
+     ["Info & Credits"] = "信息与致谢",
+     ["BorenHub TEAM - Python / Lua"] = "欢迎你使用汉化Boren脚本，这个脚本由本人亲自汉化，快手上和B站上都有号",
+     ["Thanks for using BorenHub!"] = "感谢使用汉化BorenHub！",
+     ["Executor: "] = "执行器：",
+     ["Copy"] = "复制",
+     ["JobId"] = "任务ID",
+     ["by 晓月lol"] = "by roblox-伊尔德",
+     ["Toggle"] = "打开脚本",
+     ["Lock"] = "锁定"
+}
+
+local keys = {}
+for k in pairs(Translations) do
+    table.insert(keys, k)
+end
+table.sort(
+    keys,
+    function(a, b)
+        return #a > #b
+    end
+)
+
+local function safeReplace(text, old, new)
+    local result = ""
+    local start = 1
+    while true do
+        local i, j = string.find(text, old, start, true)
+        if not i then
+            result = result .. string.sub(text, start)
+            break
+        end
+        result = result .. string.sub(text, start, i - 1) .. new
+        start = j + 1
+    end
+    return result
+end
+
+local function translateText(text)
+    if not text or type(text) ~= "string" then
+        return text
+    end
+    for _, k in ipairs(keys) do
+        text = safeReplace(text, k, Translations[k])
+    end
+    return text
+end
+
+local oldNewIndex
+oldNewIndex =
+    hookmetamethod(
+    game,
+    "__newindex",
+    function(self, key, value)
+        if key == "Text" and type(value) == "string" then
+            value = translateText(value)
+        end
+        return oldNewIndex(self, key, value)
+    end
+)
+
+loadstring(game:HttpGet("https://raw.githubusercontent.com/hdjsjjdgrhj/script-hub/refs/heads/main/bored"))()
